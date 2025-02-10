@@ -2,8 +2,9 @@ import gleam/http.{Get}
 import gleam/int
 import gleam/io
 import gleam/list
-import gleam/option.{type Option, None, Some}
+import gleam/option.{None, Some}
 import gleam/string
+import gleam/string_tree
 import gleam/uri
 import pages/login
 import pog
@@ -77,16 +78,29 @@ fn handle_callback(req: Request, ctx: web.Context) -> Response {
         _ -> False
       }
 
-      insert_user_if_not_in_db(ctx.db, token_info, email_verified)
+      let assert Ok(pog.Returned(_c, rows)) =
+        sql.is_user_valid(ctx.db, token_info.email)
 
-      wisp.redirect(redirect_to)
-      |> wisp.set_cookie(
-        req,
-        "user_id",
-        token_info.sub,
-        security: wisp.Signed,
-        max_age: 24 * 60 * 60,
-      )
+      case rows {
+        [] -> {
+          wisp.json_response(
+            string_tree.from_string("Not allowed, sorry."),
+            403,
+          )
+        }
+        _ -> {
+          insert_user_if_not_in_db(ctx.db, token_info, email_verified)
+
+          wisp.redirect(redirect_to)
+          |> wisp.set_cookie(
+            req,
+            "user_id",
+            token_info.sub,
+            security: wisp.Signed,
+            max_age: 24 * 60 * 60,
+          )
+        }
+      }
     }
   }
 }

@@ -18,6 +18,6 @@ pub fn main_layout(
       ),
       ..head
     ]),
-    html.body([], body),
+    html.body([attribute.class("p-8")], body),
   ])
 }

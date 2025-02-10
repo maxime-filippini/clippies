@@ -26,8 +26,7 @@ pub fn get_users(db) {
     decode.success(GetUsersRow(id:, name:, email:, email_verified:))
   }
 
-  let query =
-    "SELECT *
+  let query = "SELECT *
 FROM users"
 
   pog.query(query)
@@ -59,13 +58,42 @@ pub fn get_clippings(db, arg_1) {
     decode.success(GetClippingsRow(id:, user_id:, text:))
   }
 
-  let query =
-    "SELECT *
+  let query = "SELECT *
 FROM clippings
 WHERE user_id = $1"
 
   pog.query(query)
   |> pog.parameter(pog.text(arg_1))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
+/// A row you get from running the `get_valid_users` query
+/// defined in `./src/sql/get_valid_users.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type GetValidUsersRow {
+  GetValidUsersRow(email: String)
+}
+
+/// Runs the `get_valid_users` query
+/// defined in `./src/sql/get_valid_users.sql`.
+///
+/// > 🐿️ This function was generated automatically using v3.0.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn get_valid_users(db) {
+  let decoder = {
+    use email <- decode.field(0, decode.string)
+    decode.success(GetValidUsersRow(email:))
+  }
+
+  let query = "SELECT email
+FROM valid_users"
+
+  pog.query(query)
   |> pog.returning(decoder)
   |> pog.execute(db)
 }
@@ -79,8 +107,7 @@ WHERE user_id = $1"
 pub fn insert_user(db, arg_1, arg_2, arg_3, arg_4) {
   let decoder = decode.map(decode.dynamic, fn(_) { Nil })
 
-  let query =
-    "INSERT INTO users (id, name, email, email_verified)
+  let query = "INSERT INTO users (id, name, email, email_verified)
 VALUES (
     $1, $2, $3, $4
 )"
@@ -90,6 +117,38 @@ VALUES (
   |> pog.parameter(pog.text(arg_2))
   |> pog.parameter(pog.text(arg_3))
   |> pog.parameter(pog.bool(arg_4))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
+/// A row you get from running the `is_user_valid` query
+/// defined in `./src/sql/is_user_valid.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type IsUserValidRow {
+  IsUserValidRow(email: String)
+}
+
+/// Runs the `is_user_valid` query
+/// defined in `./src/sql/is_user_valid.sql`.
+///
+/// > 🐿️ This function was generated automatically using v3.0.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn is_user_valid(db, arg_1) {
+  let decoder = {
+    use email <- decode.field(0, decode.string)
+    decode.success(IsUserValidRow(email:))
+  }
+
+  let query = "SELECT email
+FROM valid_users
+WHERE email = $1"
+
+  pog.query(query)
+  |> pog.parameter(pog.text(arg_1))
   |> pog.returning(decoder)
   |> pog.execute(db)
 }
@@ -119,8 +178,7 @@ pub fn find_user(db, arg_1) {
     decode.success(FindUserRow(id:, name:, email:, email_verified:))
   }
 
-  let query =
-    "SELECT *
+  let query = "SELECT *
 FROM users
 WHERE id = $1
 LIMIT 1"
@@ -140,8 +198,7 @@ LIMIT 1"
 pub fn insert_clipping(db, arg_1, arg_2, arg_3) {
   let decoder = decode.map(decode.dynamic, fn(_) { Nil })
 
-  let query =
-    "INSERT INTO clippings (id, user_id, text)
+  let query = "INSERT INTO clippings (id, user_id, text)
 VALUES ($1, $2, $3)"
 
   pog.query(query)

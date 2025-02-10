@@ -2,6 +2,11 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "kill-server",
+      "type": "shell",
+      "command": "PID=$(pgrep beam.smp); kill -9 $PID || true && exit 0;"
+    },
+    {
       "label": "client",
       "type": "shell",
       "command": "./scripts/client.sh",
@@ -14,7 +19,32 @@
     {
       "label": "server",
       "type": "shell",
-      "command": "./scripts/server.sh",
+      "command": "./scripts/client.sh && ./scripts/server.sh",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "runOptions": {
+        "instanceLimit": 999
+      },
+      "dependsOn": ["kill-server"],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "db",
+      "type": "shell",
+      "command": "./scripts/db.sh",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "tailwind",
+      "type": "shell",
+      "command": "./scripts/tw.sh",
       "problemMatcher": [],
       "group": {
         "kind": "build",

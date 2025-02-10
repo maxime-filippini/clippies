@@ -6,4 +6,4 @@ services:
       - .env
     image: clippies-server
     ports:
-      - "42069:42069"
+      - "42070:42069"

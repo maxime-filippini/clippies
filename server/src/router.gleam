@@ -1,50 +1,44 @@
-import client
 import gleam/http.{Get}
 import gleam/int
-import gleam/io
-import gleam/json
-import gleam/string_tree
-import lustre/attribute
-import lustre/element
-import lustre/element/html
+import pages/main_page
+import pog
+import server/api/router as api_router
+import server/auth/router as auth_router
+import server/utils
 import server/web
+import shared/encoders
+import shared/sql
 import wisp.{type Request, type Response}
-
-// Route handlers -----------------------------------------
 
 pub fn route_request(req: Request, ctx: web.Context) -> Response {
   use req <- web.middleware(req, ctx)
 
   case req.method, wisp.path_segments(req) {
-    Get, ["count", v] -> {
-      let assert Ok(w) = int.parse(v)
-      main_layout(w)
-      |> element.to_document_string
-      |> string_tree.from_string
-      |> wisp.html_body(wisp.ok(), _)
-    }
+    Get, ["auth", ..segments] -> auth_router.handle_request(req, ctx, segments)
+    _, ["api", ..segments] -> api_router.handle_request(req, ctx, segments)
+
+    Get, segments -> handle_index_request(req, ctx, segments)
+
     _, _ -> wisp.response(200)
   }
 }
 
-// On index, we render a counter as an html shell and hydrate with the client's
-// javascript
+fn handle_index_request(
+  req: Request,
+  ctx: web.Context,
+  segments: List(String),
+) -> Response {
+  case req.method, segments {
+    Get, [] -> {
+      use _req, _resp, user <- web.require_authentication(req, ctx)
 
-fn main_layout(v: Int) {
-  html.html([], [
-    html.head([], [
-      html.script(
-        [attribute.type_("module"), attribute.src("/static/client.min.mjs")],
-        "",
-      ),
-      html.script(
-        [attribute.type_("application/json"), attribute.id("model")],
-        json.int(v)
-          |> json.to_string,
-      ),
-    ]),
-    html.body([], [
-      html.div([attribute.id("app")], [client.view(client.MainPage(value: v))]),
-    ]),
-  ])
+      // Load the clippings
+      let assert Ok(pog.Returned(_count, rows)) =
+        sql.get_clippings(ctx.db, user.id)
+
+      main_page.main_page(rows)
+      |> utils.page_to_response
+    }
+    _, _ -> wisp.not_found()
+  }
 }

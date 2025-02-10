@@ -1,50 +1,49 @@
-import gleam/dynamic
-import gleam/dynamic/decode
-import gleam/int
-import gleam/io
 import gleam/json
+import gleam/list
 import gleam/result
 import lustre
 import lustre/effect.{type Effect, none}
 import lustre/element.{type Element}
-import lustre/element/html
-import lustre/event.{on_click}
 import plinth/browser/document
 import plinth/browser/element as plelement
+import shared/decoders
+import shared/pages/main.{Clipping, MainPage, UserSelected} as pgmain
+import shared/sql
 
-pub type Model {
-  MainPage(value: Int)
+pub fn init(flags: List(sql.GetClippingsRow)) {
+  let clippings =
+    flags
+    |> list.map(fn(c) { pgmain.Clipping(c.id, c.text, selected: False) })
+  #(MainPage(clippings:), none())
 }
 
-pub type Msg {
-  Incr
-  Decr
-}
-
-pub fn init(flags) {
-  io.debug(flags)
-  #(MainPage(value: flags), none())
-}
-
-pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
+pub fn update(
+  model: pgmain.Model,
+  msg: pgmain.Msg,
+) -> #(pgmain.Model, Effect(pgmain.Msg)) {
   case model, msg {
-    MainPage(value: v), Incr -> #(MainPage(value: v + 1), none())
-    MainPage(value: v), Decr -> #(MainPage(value: v - 1), none())
+    MainPage(clippings: x), UserSelected(id: v) -> #(
+      MainPage(
+        clippings: x
+        |> list.map(fn(c) {
+          let selected = case c.selected, c.id == v {
+            True, True -> False
+            True, False -> True
+            False, True -> True
+            False, False -> False
+          }
+
+          Clipping(..c, selected:)
+        }),
+      ),
+      none(),
+    )
   }
 }
 
-pub fn view(model: Model) -> Element(Msg) {
+pub fn view(model: pgmain.Model) -> Element(pgmain.Msg) {
   case model {
-    MainPage(value: v) ->
-      html.div([], [
-        html.p([], [
-          v
-          |> int.to_string
-          |> html.text,
-        ]),
-        html.button([on_click(Decr)], [html.text("-")]),
-        html.button([on_click(Incr)], [html.text("+")]),
-      ])
+    MainPage(clippings: c) -> pgmain.view_clippings(c)
   }
 }
 
@@ -53,14 +52,13 @@ pub fn main() {
     document.query_selector("#model")
     |> result.map(plelement.inner_text)
     |> result.try(fn(x) {
-      json.parse(x, decode.int) |> result.replace_error(Nil)
+      json.parse(x, decoders.clippings_decoder())
+      |> result.replace_error(Nil)
     })
 
-  io.debug(json_)
-
   let flags = case json_ {
-    Ok(count) -> count
-    Error(_) -> 0
+    Ok(v) -> v
+    Error(_) -> []
   }
 
   let app = lustre.application(init, update, view)

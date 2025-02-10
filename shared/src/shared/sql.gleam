@@ -1,0 +1,153 @@
+import gleam/dynamic/decode
+import pog
+
+/// A row you get from running the `get_users` query
+/// defined in `./src/sql/get_users.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type GetUsersRow {
+  GetUsersRow(id: String, name: String, email: String, email_verified: Bool)
+}
+
+/// Runs the `get_users` query
+/// defined in `./src/sql/get_users.sql`.
+///
+/// > 🐿️ This function was generated automatically using v3.0.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn get_users(db) {
+  let decoder = {
+    use id <- decode.field(0, decode.string)
+    use name <- decode.field(1, decode.string)
+    use email <- decode.field(2, decode.string)
+    use email_verified <- decode.field(3, decode.bool)
+    decode.success(GetUsersRow(id:, name:, email:, email_verified:))
+  }
+
+  let query =
+    "SELECT *
+FROM users"
+
+  pog.query(query)
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
+/// A row you get from running the `get_clippings` query
+/// defined in `./src/sql/get_clippings.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type GetClippingsRow {
+  GetClippingsRow(id: String, user_id: String, text: String)
+}
+
+/// Runs the `get_clippings` query
+/// defined in `./src/sql/get_clippings.sql`.
+///
+/// > 🐿️ This function was generated automatically using v3.0.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn get_clippings(db, arg_1) {
+  let decoder = {
+    use id <- decode.field(0, decode.string)
+    use user_id <- decode.field(1, decode.string)
+    use text <- decode.field(2, decode.string)
+    decode.success(GetClippingsRow(id:, user_id:, text:))
+  }
+
+  let query =
+    "SELECT *
+FROM clippings
+WHERE user_id = $1"
+
+  pog.query(query)
+  |> pog.parameter(pog.text(arg_1))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
+/// Runs the `insert_user` query
+/// defined in `./src/sql/insert_user.sql`.
+///
+/// > 🐿️ This function was generated automatically using v3.0.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn insert_user(db, arg_1, arg_2, arg_3, arg_4) {
+  let decoder = decode.map(decode.dynamic, fn(_) { Nil })
+
+  let query =
+    "INSERT INTO users (id, name, email, email_verified)
+VALUES (
+    $1, $2, $3, $4
+)"
+
+  pog.query(query)
+  |> pog.parameter(pog.text(arg_1))
+  |> pog.parameter(pog.text(arg_2))
+  |> pog.parameter(pog.text(arg_3))
+  |> pog.parameter(pog.bool(arg_4))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
+/// A row you get from running the `find_user` query
+/// defined in `./src/sql/find_user.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type FindUserRow {
+  FindUserRow(id: String, name: String, email: String, email_verified: Bool)
+}
+
+/// Runs the `find_user` query
+/// defined in `./src/sql/find_user.sql`.
+///
+/// > 🐿️ This function was generated automatically using v3.0.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn find_user(db, arg_1) {
+  let decoder = {
+    use id <- decode.field(0, decode.string)
+    use name <- decode.field(1, decode.string)
+    use email <- decode.field(2, decode.string)
+    use email_verified <- decode.field(3, decode.bool)
+    decode.success(FindUserRow(id:, name:, email:, email_verified:))
+  }
+
+  let query =
+    "SELECT *
+FROM users
+WHERE id = $1
+LIMIT 1"
+
+  pog.query(query)
+  |> pog.parameter(pog.text(arg_1))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
+/// Runs the `insert_clipping` query
+/// defined in `./src/sql/insert_clipping.sql`.
+///
+/// > 🐿️ This function was generated automatically using v3.0.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn insert_clipping(db, arg_1, arg_2, arg_3) {
+  let decoder = decode.map(decode.dynamic, fn(_) { Nil })
+
+  let query =
+    "INSERT INTO clippings (id, user_id, text)
+VALUES ($1, $2, $3)"
+
+  pog.query(query)
+  |> pog.parameter(pog.text(arg_1))
+  |> pog.parameter(pog.text(arg_2))
+  |> pog.parameter(pog.text(arg_3))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}

@@ -11,3 +11,4 @@ This is mostly an avenue for me to learn about SSR, JS hydration and mode comple
 ## To do
 
 - [ ] Make a list of authorized users in the database
+- [ ] Set up docker for deployments

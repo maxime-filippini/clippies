@@ -12,6 +12,10 @@ pub fn main_layout(
         attribute.rel("stylesheet"),
         attribute.href("/static/output.css"),
       ]),
+      html.meta([
+        attribute.name("viewport"),
+        attribute.content("width=device-width, initial-scale=1"),
+      ]),
       html.script(
         [attribute.type_("module"), attribute.src("/static/client.min.mjs")],
         "",

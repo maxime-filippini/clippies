@@ -72,13 +72,17 @@ pub fn view(model: Model) -> Element(Msg) {
 
 pub fn view_clippings(rows: List(Clipping)) {
   html.div(
-    [attribute.class("flex flex-wrap gap-8 w-full")],
+    [
+      attribute.class(
+        "flex md:flex-row flex-col w-full md:flex-wrap gap-8 w-full",
+      ),
+    ],
     rows
       |> list.map(fn(row) {
         html.button(
           [
             event.on_click(UserClickedClipping(row.id)),
-            attribute.class("text-start"),
+            attribute.class("text-start md:w-full"),
           ],
           [card.clipping_card(row.id, row.text)],
         )

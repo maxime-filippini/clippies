@@ -1,0 +1,6 @@
+case argv.load().arguments {
+   ["hello", name] ->
+     io.println("Hello, " <> name <> "!")
+   _ ->
+     io.println("usage: ./program hello <name>")
+ }

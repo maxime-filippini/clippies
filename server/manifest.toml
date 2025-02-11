@@ -47,7 +47,7 @@ packages = [
   { name = "platform", version = "1.0.0", build_tools = ["gleam"], requirements = [], otp_app = "platform", source = "hex", outer_checksum = "8339420A95AD89AAC0F82F4C3DB8DD401041742D6C3F46132A8739F6AEB75391" },
   { name = "plinth", version = "0.5.6", build_tools = ["gleam"], requirements = ["conversation", "gleam_javascript", "gleam_json", "gleam_stdlib"], otp_app = "plinth", source = "hex", outer_checksum = "7A9BEAB98F4BC6859803D5ABCD0F3B4C3578A747F12BF32F9E234F8325F5F0E0" },
   { name = "pog", version = "3.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "pgo"], otp_app = "pog", source = "hex", outer_checksum = "63152DADEBAE3150C81E9612909974C3C38F3E35B41F252798069A2FD117308E" },
-  { name = "shared", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_json", "gleam_stdlib", "pog"], source = "local", path = "../shared" },
+  { name = "shared", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_json", "gleam_stdlib", "lustre", "plinth", "pog"], source = "local", path = "../shared" },
   { name = "simplifile", version = "2.2.0", build_tools = ["gleam"], requirements = ["filepath", "gleam_stdlib"], otp_app = "simplifile", source = "hex", outer_checksum = "0DFABEF7DC7A9E2FF4BB27B108034E60C81BEBFCB7AB816B9E7E18ED4503ACD8" },
   { name = "squirrel", version = "3.0.0", build_tools = ["gleam"], requirements = ["argv", "envoy", "eval", "filepath", "glam", "gleam_community_ansi", "gleam_crypto", "gleam_json", "gleam_regexp", "gleam_stdlib", "glexer", "justin", "mug", "non_empty_list", "pog", "simplifile", "term_size", "tom", "tote", "youid"], otp_app = "squirrel", source = "hex", outer_checksum = "EFCF5BB6483FD0DF6BBDF09C63238A0FA440A764C1F62848972417FE89F71C7C" },
   { name = "ssl_verify_fun", version = "1.1.7", build_tools = ["mix", "rebar3", "make"], requirements = [], otp_app = "ssl_verify_fun", source = "hex", outer_checksum = "FE4C190E8F37401D30167C8C405EDA19469F34577987C76DDE613E838BBC67F8" },
@@ -61,6 +61,7 @@ packages = [
 ]
 
 [requirements]
+argv = { version = ">= 1.0.2 and < 2.0.0" }
 envoy = { version = ">= 1.0.2 and < 2.0.0" }
 gleam_erlang = { version = ">= 0.34.0 and < 1.0.0" }
 gleam_hackney = { version = ">= 1.3.1 and < 2.0.0" }
@@ -73,6 +74,7 @@ mist = { version = ">= 4.0.6 and < 5.0.0" }
 plinth = { version = ">= 0.5.6 and < 1.0.0" }
 pog = { version = ">= 3.2.0 and < 4.0.0" }
 shared = { path = "../shared" }
+simplifile = { version = ">= 2.2.0 and < 3.0.0" }
 squirrel = { version = ">= 3.0.0 and < 4.0.0" }
 wisp = { version = ">= 1.5.3 and < 2.0.0" }
 youid = { version = ">= 1.2.0 and < 2.0.0" }
